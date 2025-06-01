@@ -391,6 +391,36 @@ class GitHubSource(BaseSource):
         except Exception as e:
             logger.error(f"Error processing file {item_path}: {str(e)}")
 
+    async def _create_branch(
+        self, client: httpx.AsyncClient, repo_name: str, branch: str, base_branch: str
+    ) -> None:
+        """Create a new branch in the repository.
+
+        Args:
+            client: HTTP client
+            repo_name: Repository name (format: "owner/repo")
+            branch: Name of the branch to create
+            base_branch: Name of the branch to base the new branch on
+
+        Raises:
+            ValueError: If branch creation fails
+        """
+        try:
+            # Get the SHA of the base branch
+            ref_url = f"{self.BASE_URL}/repos/{repo_name}/git/refs/heads/{base_branch}"
+            ref_data = await self._get_with_auth(client, ref_url)
+            base_sha = ref_data["object"]["sha"]
+
+            # Create the new branch
+            create_url = f"{self.BASE_URL}/repos/{repo_name}/git/refs"
+            create_data = {"ref": f"refs/heads/{branch}", "sha": base_sha}
+
+            await self._post_with_auth(client, create_url, create_data)
+            logger.info(f"Created new branch: {branch} based on {base_branch}")
+        except Exception as e:
+            logger.error(f"Failed to create branch {branch}: {str(e)}")
+            raise ValueError(f"Failed to create branch {branch}: {str(e)}") from e
+
     async def generate_entities(self) -> AsyncGenerator[ChunkEntity, None]:
         """Generate entities from GitHub repository.
 
@@ -419,11 +449,17 @@ class GitHubSource(BaseSource):
                 branch_names = [b["name"] for b in branches_data]
 
                 if branch not in branch_names:
-                    available_branches = ", ".join(branch_names)
-                    raise ValueError(
-                        f"Branch '{branch}' not found in repository '{self.repo_name}'. "
-                        f"Available branches: {available_branches}"
-                    )
+                    try:
+                        await self._create_branch(
+                            client, self.repo_name, branch, repo_data["default_branch"]
+                        )
+                    except ValueError as e:
+                        available_branches = ", ".join(branch_names)
+                        raise ValueError(
+                            f"Branch '{branch}' not found in repository '{self.repo_name}'. "
+                            f"failed to create it. Available branches: {available_branches}. "
+                            f"Error: {str(e)}"
+                        ) from e
 
             logger.info(f"Using branch: {branch} for repo {self.repo_name}")
 
