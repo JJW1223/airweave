@@ -84,6 +84,28 @@ class GitHubSource(BaseSource):
         wait=wait_exponential(multiplier=1, min=2, max=10),
         stop=stop_after_attempt(3),
     )
+    async def _post_with_auth(
+        self, client: httpx.AsyncClient, url: str, params: Optional[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Make authenticated POST API request using Personal Access Token.
+
+        Args:
+            client: HTTP client
+            url: API endpoint URL
+            params: Optional query parameters to include in the request.
+
+        Returns:
+            JSON response
+        """
+        headers = {
+            "Authorization": f"token {self.personal_access_token}",
+            "Accept": "application/vnd.github.v3+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+        response = await client.post(url, headers=headers, json=params)
+        response.raise_for_status()
+        return response.json()
+
     async def _get_with_auth(
         self, client: httpx.AsyncClient, url: str, params: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
