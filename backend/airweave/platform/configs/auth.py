@@ -404,3 +404,17 @@ class TodoistAuthConfig(AuthConfig):
     access_token: str = Field(
         title="Access Token", description="The access token for your Todoist app."
     )
+
+
+class DiscordAuthConfig(AuthConfig):
+    """Discord authentication credentials schema."""
+
+    access_token: str = Field(
+        title="Access Token", description="The access token for your Discord app."
+    )
+
+
+class DiscordConfig(BaseConfig):
+    """Discord source config schema."""
+
+    pass
