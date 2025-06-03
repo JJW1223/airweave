@@ -234,3 +234,16 @@ integrations:
 
   qdrant:
     auth_type: "config_class"
+
+  discord:
+    auth_type: "oauth2"
+    url: "https://discord.com/api/oauth2/authorize"
+    backend_url: "https://discord.com/api/oauth2/token"
+    grant_type: "authorization_code"
+    client_id: "YOUR_DISCORD_CLIENT_ID"
+    client_secret: "YOUR_DISCORD_CLIENT_SECRET"
+    content_type: "application/x-www-form-urlencoded"
+    client_credential_location: "body"
+    scope: "identify guilds messages.read"
+    additional_frontend_params:
+      response_type: "code"
