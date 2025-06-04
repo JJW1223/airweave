@@ -5,9 +5,11 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import aiohttp
+from typing_extensions import AsyncGenerator as AsyncGeneratorType
 
 from airweave.platform.auth.schemas import AuthType
 from airweave.platform.decorators import source
+from airweave.platform.entities._base import ChunkEntity
 from airweave.platform.entities.discord import (
     DiscordChannel,
     DiscordGuild,
@@ -247,7 +249,7 @@ class DiscordSource(BaseSource):
 
         Args:
             guild_id (str): ID of the guild to fetch members from
-            limit (int, optional): Maximum number of members to fetch. Defaults to 1000.
+            limit (int, optional): Maximum number of members to fetch. Defaults to 1000
 
         Returns:
             List[DiscordMember]: List of member objects
@@ -298,12 +300,111 @@ class DiscordSource(BaseSource):
             logger.error(f"Error validating connection: {str(e)}")
             return False
 
+    async def generate_entities(self) -> AsyncGeneratorType[ChunkEntity, None]:
+        """Generate all Discord entities: Guilds, Channels, Messages, Roles, and Members.
+
+        Yields:
+            Discord entities in the following order:
+            1. Guilds (servers)
+            2. Channels for each guild
+            3. Messages for each channel
+            4. Roles for each guild
+            5. Members for each guild
+        """
+        logger.info("===== STARTING DISCORD ENTITY GENERATION =====")
+        entity_count = 0
+
+        try:
+            # Get all guilds first
+            guilds = await self.get_guilds()
+            logger.info(f"Found {len(guilds)} guilds")
+
+            # Process each guild
+            for guild in guilds:
+                entity_count += 1
+                logger.info(f"Processing guild: {guild.name} (ID: {guild.id})")
+                yield guild
+
+                # Get channels for this guild
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(
+                        f"{self.base_url}/guilds/{guild.id}/channels", headers=self.headers
+                    ) as response:
+                        if response.status == 200:
+                            channels_data = await response.json()
+                            for channel_data in channels_data:
+                                channel = DiscordChannel(
+                                    id=channel_data["id"],
+                                    name=channel_data["name"],
+                                    guild_id=guild.id,
+                                    channel_type=channel_data["type"],
+                                    topic=channel_data.get("topic"),
+                                    position=channel_data.get("position", 0),
+                                    created_at=datetime.fromtimestamp(
+                                        ((int(channel_data["id"]) >> 22) + 1420070400000) / 1000
+                                    ),
+                                )
+                                entity_count += 1
+                                logger.info(
+                                    f"Processing channel: {channel.name} (ID: {channel.id})"
+                                )
+                                yield channel
+
+                                # Get messages for this channel
+                                messages = await self.get_messages(channel.id)
+                                for message in messages:
+                                    entity_count += 1
+                                    yield message
+
+                # Get roles for this guild
+                roles = await self.get_roles(guild.id)
+                for role in roles:
+                    entity_count += 1
+                    yield role
+
+                # Get members for this guild
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(
+                        f"{self.base_url}/guilds/{guild.id}/members", headers=self.headers
+                    ) as response:
+                        if response.status == 200:
+                            members_data = await response.json()
+                            for member_data in members_data:
+                                user_data = member_data["user"]
+                                member = DiscordMember(
+                                    id=f"{guild.id}-{user_data['id']}",
+                                    user_id=user_data["id"],
+                                    guild_id=guild.id,
+                                    nick=member_data.get("nick"),
+                                    roles=member_data.get("roles", []),
+                                    joined_at=datetime.fromisoformat(
+                                        member_data["joined_at"].replace("Z", "+00:00")
+                                    ),
+                                    premium_since=datetime.fromisoformat(
+                                        member_data["premium_since"].replace("Z", "+00:00")
+                                    )
+                                    if member_data.get("premium_since")
+                                    else None,
+                                    is_pending=member_data.get("pending", False),
+                                )
+                                entity_count += 1
+                                yield member
+
+        except Exception as e:
+            logger.error(f"Error in Discord entity generation: {str(e)}", exc_info=True)
+            raise
+        finally:
+            logger.info(f"===== DISCORD ENTITY GENERATION COMPLETE: {entity_count} entities =====")
+
     @classmethod
-    async def create(cls, credentials: Dict[str, Any]) -> "DiscordSource":
+    async def create(
+        cls, credentials: Dict[str, Any], config: Optional[Dict[str, Any]] = None
+    ) -> "DiscordSource":
         """Create a new Discord source instance.
 
         Args:
             credentials (Dict[str, Any]): Dictionary containing access_token
+            config (Optional[Dict[str, Any]]): Optional configuration parameters
 
         Returns:
             DiscordSource: New Discord source instance
