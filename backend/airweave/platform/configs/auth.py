@@ -409,6 +409,14 @@ class TodoistAuthConfig(AuthConfig):
 class DiscordAuthConfig(AuthConfig):
     """Discord authentication credentials schema."""
 
+    client_id: Optional[str] = Field(
+        default=None, title="Client ID", description="The OAuth client ID for your Discord app"
+    )
+    client_secret: Optional[str] = Field(
+        default=None,
+        title="Client Secret",
+        description="The OAuth client secret for your Discord app",
+    )
     access_token: str = Field(
         title="Access Token", description="The access token for your Discord app."
     )
