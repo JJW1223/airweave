@@ -492,3 +492,21 @@ def ensure_file_entity_models():
                     )
                 except Exception as e:
                     print(f"Runtime: Error creating models for {cls.__name__}: {e}")
+
+
+class EntityType(str, Enum):
+    """Type of entity."""
+
+    USER = "user"
+    ORGANIZATION = "organization"
+    CHANNEL = "channel"
+    MESSAGE = "message"
+    ROLE = "role"
+    MEMBER = "member"
+    FILE = "file"
+    CODE = "code"
+    WEB = "web"
+
+
+# Alias Entity to BaseEntity for backward compatibility
+Entity = BaseEntity
