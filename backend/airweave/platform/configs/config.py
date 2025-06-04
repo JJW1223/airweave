@@ -5,6 +5,12 @@ from pydantic import Field, validator
 from airweave.platform.configs._base import BaseConfig
 
 
+class DiscordConfig(BaseConfig):
+    """Discord source config schema."""
+
+    pass
+
+
 class SourceConfig(BaseConfig):
     """Source config schema."""
 
