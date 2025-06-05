@@ -90,9 +90,10 @@ Docker가 설치되어 있다는 가정하에 다음 단계로 실행합니다.
 ## Usage
 ### Example_GitHub
 1. Dashboard의 Github(또는 사용할 앱)을 선택합니다.
-2. Github PAT, 데이터를 불러올 repository를 입력합니다
+2. Github PAT, 데이터를 불러올 repository를 입력합니다.
 3. branch를 입력합니다. (없으면 생성됨)
-4. create를 누르고 기다리면 github collection이 생성되는데 query를 이용해서 해당 repository 정보와 openai를 이용하여 질문을 처리할 수 있습니다.
+4. create를 누르고 기다리면 github collection이 생성되고 들어갑니다.
+5. query를 이용해서 영어로 된 질문을 해당 repository 정보와 openai를 이용하여 질문을 처리할 수 있습니다. (completion 권장)
 
 ## 디렉터리 구조
 ```
