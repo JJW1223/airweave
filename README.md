@@ -7,11 +7,42 @@
 ## Requirements
 ### Backend
 - Python 3.11 이상
-- 의존성 관리는 [Poetry](https://python-poetry.org/)로 수행 (필요 패키지는  `pyproject.toml` 참고)
+- 의존성 관리는 [Poetry](https://python-poetry.org/)로 수행 (필요 패키지는 전문  `pyproject.toml` 참고)
+```
+python = "^3.11"
+fastapi = "^0.115.12"
+uvicorn = {extras = ["standard"], version = "^0.27.0"}
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.25"}
+alembic = "^1.13.1"
+asyncpg = "^0.29.0"
+pydantic = {extras = ["email"], version = "^2.5.3"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.6"
+python-dotenv = "^1.0.0"
+httpx = "^0.28.0"
+...
+```
 
 ### Frontend
-Node.js 20 이상
-- React + TypeScript + Vite 기반 (필요 패키지는 `frontend/package.json` 참고)
+- Node.js 20 이상
+- React + TypeScript + Vite 기반 (필요 패키지는 전문은 `frontend/package.json` 참고)
+```
+"@auth0/auth0-react": "^2.2.4",
+"@hookform/resolvers": "^3.9.0",
+"@radix-ui/react-alert-dialog": "^1.1.1",
+"@radix-ui/react-avatar": "^1.1.0",
+"@radix-ui/react-checkbox": "^1.1.1",
+"@radix-ui/react-collapsible": "^1.1.0",
+"@radix-ui/react-dialog": "^1.1.2",
+"@radix-ui/react-dropdown-menu": "^2.1.1",
+"@radix-ui/react-label": "^2.1.0",
+"@radix-ui/react-radio-group": "^1.2.0",
+"@radix-ui/react-scroll-area": "^1.1.0",
+"@radix-ui/react-select": "^2.1.1",
+"@radix-ui/react-separator": "^1.1.0",
+...
+```
 
 ## How to Install & Run
 Docker가 설치되어 있다는 가정하에 다음 단계로 실행합니다.
