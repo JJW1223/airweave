@@ -71,7 +71,7 @@ Docker가 설치되어 있다는 가정하에 다음 단계로 실행합니다.
 
 4. 실행 스크립트 실행
    ```bash
-   ./start.sh (해당 옵션 모두 n 선택)
+   ./start.sh (api key 입력 or 해당하지 않는 옵션 n 선택)
    docker ps | grep airweave # airweave-* # container가 6개(backend, frontend, qdrant, embeddings, db, redis)생성된 것을 확인. 간혹 frontend container가 안 열릴 수 있습니다. 따로 열어주시면 됩니다.
    docker start <container_id> # 6개 컨테이너 중 일부가 시작되지 않다면 해당 컨테이너 id를 넣어서 실행
    ```
