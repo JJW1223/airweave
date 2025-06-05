@@ -83,7 +83,7 @@ app.exception_handler(NotFoundException)(not_found_exception_handler)
 CORS_ORIGINS = [
     "http://localhost:5173",
     "localhost:8001",
-    "http://localhost:8080",
+    "http://localhost:10240",
     "https://app.dev-airweave.com",
     "https://app.stg-airweave.com",
     "https://app.airweave.ai",
