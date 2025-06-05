@@ -66,38 +66,38 @@ Docker가 설치되어 있다는 가정하에 다음 단계로 실행합니다.
 ## 디렉터리 구조
 ```
 /
-├── backend/                      # FastAPI 백엔드
-│   ├── airweave/
-│   │   ├── api/
-│   │   │   └── v1/endpoints/     # REST API 모듈
-│   │   ├── core/                 # 설정 및 공통 로직
-│   │   ├── crud/                 # 데이터베이스 접근
-│   │   ├── db/
-│   │   ├── models/
-│   │   ├── platform/
-│   │   │   ├── auth/
-│   │   │   ├── destinations/
-│   │   │   ├── embedding_models/
-│   │   │   ├── entities/
-│   │   │   ├── sources/
-│   │   │   ├── sync/
-│   │   │   └── transformers/
-│   │   └── schemas/
-│   └── alembic/
+├── backend/                      # FastAPI 백엔드 서버
+│   ├── airweave/                # 메인 애플리케이션 패키지
+│   │   ├── api/                 # API 관련 모듈
+│   │   │   └── v1/endpoints/    # REST API 엔드포인트 정의 (auth, users, sources 등)
+│   │   ├── core/               # 핵심 설정 및 유틸리티 (환경설정, 보안, 로깅)
+│   │   ├── crud/               # 데이터베이스 CRUD 작업
+│   │   ├── db/                 # 데이터베이스 설정 및 세션 관리
+│   │   ├── models/             # SQLAlchemy 데이터베이스 모델
+│   │   ├── platform/           # 플랫폼 핵심 기능
+│   │   │   ├── auth/           # 인증/인가 관련 모듈
+│   │   │   ├── destinations/   # 데이터 destination 관리
+│   │   │   ├── embedding_models/ # 임베딩 모델 관리 
+│   │   │   ├── entities/       # 엔티티 추출 및 처리
+│   │   │   ├── sources/        # 데이터 소스 관리
+│   │   │   ├── sync/           # 데이터 동기화 관리
+│   │   │   └── transformers/   # 데이터 변환 처리
+│   │   └── schemas/            # Pydantic 데이터 검증 스키마
+│   └── alembic/                # 데이터베이스 마이그레이션 관리
 │
-├── frontend/                     # React + TypeScript 프론트엔드
-│   ├── src/
-│   │   ├── components/
-│   │   ├── config/
-│   │   ├── constants/
-│   │   ├── hooks/
-│   │   ├── lib/
-│   │   ├── pages/
-│   │   ├── styles/
-│   │   └── types/
-│   └── public/
+├── frontend/                    # React + TypeScript 프론트엔드
+│   ├── src/                    # 소스 코드
+│   │   ├── components/         # 재사용 가능한 React 컴포넌트
+│   │   ├── config/            # 프론트엔드 설정
+│   │   ├── constants/         # 상수 정의
+│   │   ├── hooks/             # 커스텀 React 훅
+│   │   ├── lib/               # 유틸리티 함수 및 API 클라이언트
+│   │   ├── pages/             # 페이지 컴포넌트
+│   │   ├── styles/            # CSS/SCSS 스타일 파일
+│   │   └── types/             
+│   └── public/                # 정적 파일 (이미지, 아이콘 등)
 │
-├── docker/                       # docker 파일 관
+├── docker/                       # docker 파일 관리
 │   ├── docker-compose.yml
 │   ├── docker-compose.dev.yml
 │   ├── docker-compose.test.yml
